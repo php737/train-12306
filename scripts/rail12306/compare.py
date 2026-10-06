@@ -88,7 +88,7 @@ def render(stats, errors, frm, to, requested_code, fmt="md"):
              s["ze_ok"], s["ze_range"] + "元" if s["ze_range"] != "—" else "—"]
             for s in stats]
 
-    # 发车站和请求的不一致时必须讲清楚(长沙南→常德踩过)
+    # 发车站和请求的不一致时必须讲清楚(同城配对站错位,实测踩过)
     warn = ""
     codes = {c for s in stats for c in s["from_codes"]}
     if len(codes) > 1:
