@@ -34,8 +34,8 @@ M=~/.openclaw/skills/train-12306/scripts/main.py
 python $M <子命令> [参数]        # 解释器就是 python,不是 python3
 ```
 
-> ⚠️ 本机 `python` 是 venv 包装脚本(指 `/root/venv/bin/python`),`python3` 指向系统 Python,
-> 里面**没有 requests**。永远写 `python`。
+> ⚠️ **解释器用 `python`,不要用 `python3`**。部分环境里 `python` 指向 venv(装了 requests),
+> 而 `python3` 指向系统 Python(没装),用错会报 `ModuleNotFoundError: requests`。
 
 ## 1.0 代码结构(2026-10-05 拆分)
 
