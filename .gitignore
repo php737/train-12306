@@ -1,0 +1,8 @@
+# 运行时缓存(车站表 / 查询路径),由脚本自动生成
+cache/
+*.pyc
+__pycache__/
+*.egg-info/
+.venv/
+venv/
+.DS_Store
