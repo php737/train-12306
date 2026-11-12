@@ -30,8 +30,9 @@ M=~/.openclaw/skills/train-12306/scripts/main.py
 python $M <子命令> [参数]
 ```
 
-⚠️ **用 `python`**。本机 `python` 和 `python3` 都指向 venv(都有 requests),但换环境时
-`python3` 可能落到没装 requests 的系统解释器 —— 先 `python3 -c "import requests"` 验一下再用。
+⚠️ **用 `python`,不要 `python3`**。`python`(`/usr/local/bin/python` → venv)在任何 shell 都安全;
+`python3` 能不能用**取决于 shell 有没有 alias** —— 非交互场景(cron / systemd / shebang)会掉进
+系统 3.12.3,venv 库全丢。完整机制见 `local-env-notes` skill 的「python 解释器」节。
 
 ## 2. 子命令
 
