@@ -25,28 +25,6 @@ def write_cache(name, content):
         f.write(content)
 
 
-def gc_query_cache():
-    """清理遗留的 q_* 查询缓存。
-
-    2026-10-05:查询缓存已彻底去掉(经评估,实测零限流),但历史写下的 q_*.json 还在 cache/ 里。
-    这个函数负责清干净,refresh-cache 会调它。
-    """
-    if not os.path.isdir(CACHE_DIR):
-        return 0
-    removed = 0
-    try:
-        for f in os.listdir(CACHE_DIR):
-            if f.startswith("q_") and f.endswith(".json"):
-                try:
-                    os.remove(os.path.join(CACHE_DIR, f))
-                    removed += 1
-                except OSError:
-                    pass
-    except OSError:
-        pass
-    return removed
-
-
 def drop_cache(name):
     p = os.path.join(CACHE_DIR, name)
     try:

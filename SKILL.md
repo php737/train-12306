@@ -30,7 +30,8 @@ M=~/.openclaw/skills/train-12306/scripts/main.py
 python $M <子命令> [参数]
 ```
 
-⚠️ **用 `python`,不要 `python3`** —— 某些环境 `python3` 指向未装 requests 的系统解释器。
+⚠️ **用 `python`**。本机 `python` 和 `python3` 都指向 venv(都有 requests),但换环境时
+`python3` 可能落到没装 requests 的系统解释器 —— 先 `python3 -c "import requests"` 验一下再用。
 
 ## 2. 子命令
 
@@ -195,8 +196,8 @@ fallback 默认值必须是当前真实值,写错会以 `JSONDecodeError` 形式
 - **取 cookie 的请求必须每次现拿**,不能缓存,否则拿到过期 JSESSIONID
 - **查询结果不缓存** —— 实测 12306 零限流,加缓存只引入过期问题和维护负担
 - 表格对齐是手写的东亚字符宽度补齐(`_h()`/`_pad()`),本机没装 tabulate
-- `成都东` 不在官方 station_name.js 里,代码手工补了(`MISSING_STATIONS`)
-- `cache/` 只有 `stations.json`(731KB 车站表)和 `paths.json`(查询路径),7 天过期,都可随时删
+- `成都东` 官方 `station_name.js` 现在已收录(2026-11 实测),`MISSING_STATIONS` 只是兜底
+- `cache/` 只有 `stations.json`(约 715KB 车站表)和 `paths.json`(查询路径),7 天过期,都可随时删
 - **查 12306 的日期必须在 15 天预售期内**,超了会 302 到错误页,而报错文案会
   误导成「查询路径变了,跑 refresh-cache」。先跑 `today` 确认今天,再往前推 14 天
 
@@ -225,11 +226,11 @@ scripts/
 
 | 现象 | 处理 |
 |---|---|
-| `ModuleNotFoundError: requests` | 用了 `python3`,换 `python` |
+| `ModuleNotFoundError: requests` | 用错解释器了,换 `python`;先 `python3 -c "import requests"` 验 |
 | `❌ 车站没解析出来` | `stations --name "真实站名"`,别臆造站名 |
-| `❌ 302 到登录页` / `❌ 不是合法 JSON` | 跑 `refresh-cache`,多半是查询路径变了 |
+| `❌ 302 到登录页` / `❌ 不是合法 JSON` | **先查日期是否超 15 天预售期**(最常见原因,报错文案会误导成路径问题);确认在期内再跑 `refresh-cache` |
 | `❌ 未预期的错误: KeyError/TypeError` | 12306 结构变了。先 `refresh-cache`,还不行看第 4 节路径表 |
-| `❌ 没查到车次` | 去掉 `--type` / 放宽时段;也可能是真没车 |
+| `❌ 没查到车次` | 去掉 `--type` / 放宽时段;也可能是真没车,或该日期车次已改号(见第 2 节改革) |
 | `❌ 请求失败` | 加 `--verbose`;多半是临时限流,等几十秒 |
 
 调试: `TRAIN12306_DEBUG=1` 开完整 traceback(默认只给可读错误)。

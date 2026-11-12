@@ -112,7 +112,7 @@ TYPE_ALIASES = {
     "智能动车组": ("S",),   # 按特色标签匹配
 }
 
-# station_name.js 里历史上缺失的车站,手工补
+# 官方 station_name.js 现已收录成都东(2026-11 实测),这里只是兜底
 MISSING_STATIONS = [
     {"station_id": "@cdd", "station_name": "成都东", "station_code": "WEI",
      "station_pinyin": "chengdudong", "station_short": "cdd",

@@ -33,7 +33,9 @@ from rail12306.commands import (                  # noqa: E402
 def _add_filter_args(sp):
     """tickets / transfer / compare 共用的筛选参数。**别漏 --type**,
     2026-10-05 拆分时手写参数列表漏了它,导致 tickets/transfer 全部报错。"""
-    sp.add_argument("--type", default="", help="车次类型过滤,如 G / GD / GDCZ TKO")
+    sp.add_argument("--type", default="",
+                    help="车次类型过滤,如 G / GD,或中文别名 高铁,动车,特快,快速,普速。"
+                         "别名按查询日期自动展开成当期字头(普速 2026-11-25 起 T/K→N/V)")
     sp.add_argument("--after", type=int, default=0, help="最早出发小时(0-24)")
     sp.add_argument("--before", type=int, default=24, help="最晚出发小时(0-24,不含)")
 

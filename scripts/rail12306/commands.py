@@ -15,7 +15,7 @@ from .formatting import (
 )
 from .parsing import parse_route_stations, parse_tickets, parse_transfer
 from .utils import (
-    drop_cache, gc_query_cache, norm_station, today_cst,
+    drop_cache, norm_station, today_cst,
 )
 
 from . import reform
@@ -31,9 +31,7 @@ def cmd_refresh_cache(args):
     n = len(c.stations(refresh=True))
     drop_cache("paths.json")
     c.bootstrap()
-    cleaned = gc_query_cache()
-    print(f"♻️ 缓存已刷新:车站表 {n} 个,查询路径 {c.paths}"
-          + (f",清理遗留查询缓存 {cleaned} 个" if cleaned else ""))
+    print(f"♻️ 缓存已刷新:车站表 {n} 个,查询路径 {c.paths}")
 
 
 def cmd_stations(args):

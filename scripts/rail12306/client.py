@@ -19,7 +19,7 @@ from .utils import (
     cache_path, norm_station, norm_ticket_path, norm_transfer_path, write_cache,
 )
 
-# 抠不到路径时的 fallback。必须是当前真实值(实测 2026-10-05):
+# 抠不到路径时的 fallback。必须是当前真实值(2026-11-12 复验仍有效):
 #   ticket_path   -> /otn/leftTicket/queryG
 #   transfer_path -> /lcquery/queryG  ← 没有 /otn/,加了会被 302 到 passport
 FALLBACK_PATHS = {
