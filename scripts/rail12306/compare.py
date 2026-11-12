@@ -25,7 +25,7 @@ def _fetch(client, date, fr, to, types, after, before):
     if not data.get("status"):
         raise RuntimeError(data.get("messages") or "12306 返回异常")
     rows = parse_tickets((data.get("data") or {}).get("result"), client.name_map())
-    return filter_and_sort(rows, types, after, before)
+    return filter_and_sort(rows, types, after, before, date=date)
 
 
 def _summarize(date, rows):

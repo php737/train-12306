@@ -6,7 +6,7 @@ import sys
 
 from .client import Rail12306
 from .compare import cmd_compare
-from .constants import API_BASE, CACHE_DIR, SEARCH_API_BASE, TRAIN_ROUTE_PATH
+from .constants import API_BASE, CACHE_DIR, TRAIN_ROUTE_PATH
 from .filters import avail_tier, filter_and_sort
 from .formatting import (
     fmt_num, fmt_route, fmt_route_md, fmt_tickets, fmt_tickets_md,
@@ -17,6 +17,8 @@ from .parsing import parse_route_stations, parse_tickets, parse_transfer
 from .utils import (
     drop_cache, gc_query_cache, norm_station, today_cst,
 )
+
+from . import reform
 
 
 def cmd_today(args):
@@ -93,7 +95,7 @@ def cmd_tickets(args):
 
     rows = parse_tickets((data.get("data") or {}).get("result"), c.name_map())
     rows = filter_and_sort(rows, args.type, args.after, args.before,
-                           args.sort, args.desc, args.limit)
+                           args.sort, args.desc, args.limit, date=args.date)
 
     if args.format == "json":
         print(json.dumps(rows, ensure_ascii=False, indent=2))
@@ -143,7 +145,8 @@ def cmd_transfer(args):
         params["result_index"] = str(d.get("result_index", 0))
 
     rows = filter_and_sort(parse_transfer(plans, args.date), args.type,
-                           args.after, args.before, args.sort, args.desc, args.limit)
+                           args.after, args.before, args.sort, args.desc,
+                           args.limit, date=args.date)
     print(json.dumps(rows, ensure_ascii=False, indent=2) if args.format == "json"
           else (fmt_transfer_md if args.format == "md" else fmt_transfer)(
               rows, args.date, args.frm, args.to))
@@ -154,21 +157,23 @@ def cmd_route(args):
         raise RuntimeError(f"查询日期 {args.date} 早于今天")
     c = Rail12306(verbose=args.verbose)
     c.bootstrap()
-    s = c.query_get(f"{SEARCH_API_BASE}/search/v1/train/search", {
-        "keyword": args.train, "date": args.date.replace("-", "")})
-    if not s.get("data"):
+    hit = reform.resolve_train(c, args.train, args.date)
+    if not hit:
         print(f"❌ 没查到车次 {args.train}(确认日期 {args.date} 有没有这趟车)")
         return
     r = c.query_get(f"{API_BASE}{TRAIN_ROUTE_PATH}", {
-        "leftTicketDTO.train_no": s["data"][0]["train_no"],
-        "leftTicketDTO.train_date": args.date, "rand_code": ""})
+        "leftTicketDTO.train_no": hit["train_no"],
+        "leftTicketDTO.train_date": hit["date"], "rand_code": ""})
     stations = parse_route_stations((r.get("data") or {}).get("data"))
+    if hit["note"]:
+        print(f"> ℹ️ {hit['note']}")
+        print()
     if args.format == "json":
         print(json.dumps(stations, ensure_ascii=False, indent=2))
     elif args.format == "md":
-        print(fmt_route_md(stations, args.train))
+        print(fmt_route_md(stations, hit["code"]))
     else:
-        print(fmt_route(stations, args.train))
+        print(fmt_route(stations, hit["code"]))
 
 
 __all__ = ["cmd_today", "cmd_refresh_cache", "cmd_stations", "cmd_tickets",
